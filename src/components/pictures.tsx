@@ -1,5 +1,7 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { picturesSelector } from '../reducer';
 
 const Container = styled.div`
   padding: 1rem;
@@ -18,7 +20,15 @@ const Image = styled.img`
   }
 `;
 const Pictures = () => {
-  return null;
+  const picture = useSelector(picturesSelector);
+  const dispatch = useDispatch();
+  return (
+    <Container>
+      {picture.map((picture, key) => (
+        <Image key={key} src={picture.previewFormat} alt={picture.author} /> 
+      ))}
+    </Container>
+  );
 };
 
 export default Pictures;

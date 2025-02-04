@@ -1,13 +1,17 @@
 import { Loop, liftState } from 'redux-loop';
 import { compose } from 'redux';
 import { Actions } from './types/actions.type';
+import { Picture } from './types/picture.type';
+import fakepictures from './fake-datas.json';
 
 export type State = {
   counter: number,
+  pictures: Picture[],
 }
 
 export const defaultState: State = {
-  counter: 3
+  counter: 3,
+  pictures: fakepictures.slice(0, 3) as Picture[],
 }
 
 export const reducer = (state: State | undefined, action: Actions): State | Loop<State> => {
@@ -35,7 +39,7 @@ export const counterSelector = (state: State) => {
   return state.counter;
 };
 export const picturesSelector = (state: State) => {
-  throw 'Not Implemented';
+  return state.pictures;
 };
 export const getSelectedPicture = (state: State) => {
   throw 'Not Implemented';
