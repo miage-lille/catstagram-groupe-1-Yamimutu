@@ -1,40 +1,52 @@
-import { Loop, liftState } from 'redux-loop';
+import { Cmd, Loop, liftState, loop } from 'redux-loop';
 import { compose } from 'redux';
 import { Actions } from './types/actions.type';
 import { Picture } from './types/picture.type';
-import fakepictures from './fake-datas.json';
 import { some, none, Option } from 'fp-ts/lib/Option';
+import { fetchCatsRequest } from './actions';
+import { PicturesResult } from './types/api.type';
+import { cmdFetch } from './commands';
 
 export type State = {
   counter: number,
-  pictures: Picture[],
+  pictures: PicturesResult,
   pictureSelected: Option<Picture>,
 }
 
 export const defaultState: State = {
   counter: 3,
-  pictures: fakepictures.slice(0, 3) as Picture[],
-  pictureSelected: none,
+  pictures: { kind: 'SUCCESS', pictures: [] },
+  pictureSelected: none,  
 }
 
 export const reducer = (state: State | undefined, action: Actions): State | Loop<State> => {
-  if (!state) return defaultState; // mandatory by redux
+  if (!state) return defaultState; // L'appel à l'API d'intialisation se fait dans le store
   switch (action.type) {
     case 'INCREMENT':
-      return { ...state, counter: state.counter + 1, pictures: fakepictures.slice(0, state.counter + 1) as Picture[]};
+      return loop(
+        { ...state, counter: state.counter + 1},
+        Cmd.action(fetchCatsRequest(state.counter + 1))
+      );
     case 'DECREMENT':
       if(state.counter <= 3) return state;
-      return { ...state, counter: state.counter - 1, pictures: fakepictures.slice(0, state.counter - 1) as Picture[]};
+      return loop(
+        { ...state, counter: state.counter - 1},
+        Cmd.action(fetchCatsRequest(state.counter - 1))
+      );
     case 'SELECT_PICTURE':
       return { ...state, pictureSelected: some(action.picture) };
     case 'CLOSE_MODAL':
       return { ...state, pictureSelected: none };
     case 'FETCH_CATS_REQUEST':
-      throw 'Not Implemented';
+      return loop(
+        { ...state, pictures: { kind: 'LOADING' }},
+        cmdFetch(action)
+      );
     case 'FETCH_CATS_COMMIT':
-      throw 'Not Implemented';
+      return { ...state, pictures: { kind: 'SUCCESS', pictures: action.payload as Picture[] } };
     case 'FETCH_CATS_ROLLBACK':
-      throw 'Not Implemented';
+      return { ...state, pictures: { kind: 'FAILURE', error: action.error.message } };
+      
   }
 };
 

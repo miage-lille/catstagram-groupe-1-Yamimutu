@@ -3,6 +3,7 @@ import reducer, { State } from './reducer';
 import { install, LoopReducer, StoreCreator } from 'redux-loop';
 import { createLogger } from 'redux-logger';
 import { Actions } from './types/actions.type';
+import { fetchCatsRequest } from './actions';
 
 const enhancedStore = createStore as StoreCreator;
 
@@ -13,6 +14,9 @@ const logger = createLogger({
 });
 
 export const store = enhancedStore(loopReducer, undefined, compose(install(), applyMiddleware(logger)));
+
+// Permet de faire le première appel à l'API à l'initialisation
+store.dispatch(fetchCatsRequest(store.getState().counter));
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

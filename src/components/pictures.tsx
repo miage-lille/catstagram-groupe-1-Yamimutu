@@ -27,26 +27,35 @@ const Pictures = () => {
   const picture = useSelector(picturesSelector);
   const selectedPicture = useSelector(getSelectedPicture) as Option<Picture>;
   const dispatch = useDispatch();
-  return (
-    <Container>
-      {picture.map((picture, key) => (
-        <Image 
-          key={key} 
-          src={picture.previewFormat}
-          alt={picture.author} 
-          onClick={() => dispatch(selectPicture(picture))}/> 
-      ))}
-      {fold(
-        () => null,
-        (picture: Picture) => (
-          <ModalPortal
-            largeFormat={picture.largeFormat}
-            close={() => dispatch(closeModal())}
-          />
-        )
-      )(selectedPicture)}
-    </Container>
-  );
+
+  switch(picture.kind){
+    case 'LOADING':
+      return <div>Loading...</div>;
+    case 'FAILURE':
+      return <div>Error: {picture.error}</div>;
+    case 'SUCCESS':
+      return (
+        <Container>
+          {picture.pictures.map((picture, key) => (
+            <Image 
+              key={key} 
+              src={picture.previewFormat}
+              alt={picture.author} 
+              onClick={() => dispatch(selectPicture(picture))}/> 
+          ))}
+          {fold(
+            () => null,
+            (picture: Picture) => (
+              <ModalPortal
+                largeFormat={picture.largeFormat}
+                close={() => dispatch(closeModal())}
+              />
+            )
+          )(selectedPicture)}
+        </Container>
+      );
+  }
+  
 };
 
 export default Pictures;
