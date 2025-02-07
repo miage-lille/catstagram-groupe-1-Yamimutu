@@ -15,7 +15,7 @@ const logger = createLogger({
 
 export const store = enhancedStore(loopReducer, undefined, compose(install(), applyMiddleware(logger)));
 
-// Permet de faire le première appel à l'API à l'initialisation
+// Permet de faire le premier appel à l'API à l'initialisation
 store.dispatch(fetchCatsRequest(store.getState().counter));
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
