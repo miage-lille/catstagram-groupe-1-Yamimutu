@@ -1,5 +1,11 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { getSelectedPicture, picturesSelector } from '../reducer';
+import { selectPicture, closeModal } from '../actions';
+import ModalPortal from './modal';
+import { Option, fold, isSome } from 'fp-ts/lib/Option';
+import { Picture } from '../types/picture.type';
 
 const Container = styled.div`
   padding: 1rem;
@@ -18,7 +24,38 @@ const Image = styled.img`
   }
 `;
 const Pictures = () => {
-  return null;
+  const picture = useSelector(picturesSelector);
+  const selectedPicture = useSelector(getSelectedPicture) as Option<Picture>;
+  const dispatch = useDispatch();
+
+  switch(picture.kind){
+    case 'LOADING':
+      return <div>Loading...</div>;
+    case 'FAILURE':
+      return <div>Error: {picture.error}</div>;
+    case 'SUCCESS':
+      return (
+        <Container>
+          {picture.pictures.map((picture, key) => (
+            <Image 
+              key={key} 
+              src={picture.previewFormat}
+              alt={picture.author} 
+              onClick={() => dispatch(selectPicture(picture))}/> 
+          ))}
+          {fold(
+            () => null,
+            (picture: Picture) => (
+              <ModalPortal
+                largeFormat={picture.largeFormat}
+                close={() => dispatch(closeModal())}
+              />
+            )
+          )(selectedPicture)}
+        </Container>
+      );
+  }
+  
 };
 
 export default Pictures;
