@@ -7,6 +7,7 @@ import fakepictures from './fake-datas.json';
 export type State = {
   counter: number,
   pictures: Picture[],
+  selectedPicture?: Picture,
 }
 
 export const defaultState: State = {
@@ -23,9 +24,9 @@ export const reducer = (state: State | undefined, action: Actions): State | Loop
       if(state.counter <= 3) return state;
       return { ...state, counter: state.counter - 1, pictures: fakepictures.slice(0, state.counter - 1) as Picture[]};
     case 'SELECT_PICTURE':
-      throw 'Not Implemented';
+      return { ...state, selectedPicture: action.picture };
     case 'CLOSE_MODAL':
-      throw 'Not Implemented';
+      return { ...state, selectedPicture: undefined };
     case 'FETCH_CATS_REQUEST':
       throw 'Not Implemented';
     case 'FETCH_CATS_COMMIT':
@@ -42,7 +43,7 @@ export const picturesSelector = (state: State) => {
   return state.pictures;
 };
 export const getSelectedPicture = (state: State) => {
-  throw 'Not Implemented';
+  return state.selectedPicture;
 };
 
 export default compose(liftState, reducer);
