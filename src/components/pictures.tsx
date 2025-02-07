@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { getSelectedPicture, picturesSelector } from '../reducer';
 import { selectPicture, closeModal } from '../actions';
 import ModalPortal from './modal';
+import { Option, fold, isSome } from 'fp-ts/lib/Option';
+import { Picture } from '../types/picture.type';
 
 const Container = styled.div`
   padding: 1rem;
@@ -23,7 +25,7 @@ const Image = styled.img`
 `;
 const Pictures = () => {
   const picture = useSelector(picturesSelector);
-  const selectedPicture = useSelector(getSelectedPicture);
+  const selectedPicture = useSelector(getSelectedPicture) as Option<Picture>;
   const dispatch = useDispatch();
   return (
     <Container>
@@ -34,12 +36,15 @@ const Pictures = () => {
           alt={picture.author} 
           onClick={() => dispatch(selectPicture(picture))}/> 
       ))}
-      {selectedPicture && (
-        <ModalPortal
-          largeFormat={selectedPicture.largeFormat}
-          close={() => dispatch(closeModal())}
-        />
-      )}
+      {fold(
+        () => null,
+        (picture: Picture) => (
+          <ModalPortal
+            largeFormat={picture.largeFormat}
+            close={() => dispatch(closeModal())}
+          />
+        )
+      )(selectedPicture)}
     </Container>
   );
 };
