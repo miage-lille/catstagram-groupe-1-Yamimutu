@@ -18,10 +18,10 @@ export const reducer = (state: State | undefined, action: Actions): State | Loop
   if (!state) return defaultState; // mandatory by redux
   switch (action.type) {
     case 'INCREMENT':
-      return { ...state, counter: state.counter + 1};
+      return { ...state, counter: state.counter + 1, pictures: fakepictures.slice(0, state.counter + 1) as Picture[]};
     case 'DECREMENT':
       if(state.counter <= 3) return state;
-      return { ...state, counter: state.counter - 1};
+      return { ...state, counter: state.counter - 1, pictures: fakepictures.slice(0, state.counter - 1) as Picture[]};
     case 'SELECT_PICTURE':
       throw 'Not Implemented';
     case 'CLOSE_MODAL':

@@ -21,7 +21,6 @@ const Image = styled.img`
 `;
 const Pictures = () => {
   const picture = useSelector(picturesSelector);
-  const dispatch = useDispatch();
   return (
     <Container>
       {picture.map((picture, key) => (
